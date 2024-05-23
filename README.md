@@ -15,7 +15,6 @@ package main
 import (
     "context"
     "fmt"
-    "time"
 
     "github.com/curelyai/curelyai-go"
 )
@@ -23,10 +22,7 @@ import (
 func main() {
     client := curelyai_go.NewChatClient("your-bot-key")
     
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-    defer cancel()
-
-    response, err := client.Chat(ctx, "Hello, Curely!")
+    response, err := client.Chat(context.Background(), "Hello, How are you!")
     if err != nil {
         fmt.Println("Error:", err)
         return
