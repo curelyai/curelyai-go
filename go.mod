@@ -1,3 +1,3 @@
-module github.com/curelyai/curelyai-go
+module curelyai
 
 go 1.22.3

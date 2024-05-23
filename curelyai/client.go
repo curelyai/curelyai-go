@@ -1,4 +1,4 @@
-package curelyai_go
+package curelyai
 
 import (
 	"bytes"
@@ -20,12 +20,16 @@ type ChatClient struct {
 	Client  *http.Client
 }
 
-// NewChatClient creates a new ChatClient instance with the specified bot key.
-func NewChatClient(botKey string) *ChatClient {
+// NewChatClient creates a new ChatClient instance with the specified bot key and optional timeout.
+func NewChatClient(botKey string, timeout ...time.Duration) *ChatClient {
+	clientTimeout := 10 * time.Second
+	if len(timeout) > 0 {
+		clientTimeout = timeout[0]
+	}
 	return &ChatClient{
 		BotKey:  botKey,
 		BaseURL: defaultBaseURL,
-		Client:  &http.Client{Timeout: 10 * time.Second},
+		Client:  &http.Client{Timeout: clientTimeout},
 	}
 }
 
@@ -53,14 +57,14 @@ func (c *ChatClient) Chat(ctx context.Context, message string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("failed to get a successful response from the server")
+		return "", errors.New("failed to get a successful response from the server, status code: " + resp.Status)
 	}
 
 	var result struct {
 		Message string `json:"message"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", err
+		return "", errors.New("failed to decode response: " + err.Error())
 	}
 
 	return result.Message, nil
